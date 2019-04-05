@@ -5,7 +5,7 @@ import itertools
 from misc import *
 import multiprocessing as mp
 from sklearn import cross_validation
-#from sklearn.model_selection import KFold
+from sklearn.model_selection import KFold
 from keras.layers.advanced_activations import LeakyReLU,ELU
 from sklearn.preprocessing import OneHotEncoder
 import pickle
@@ -226,16 +226,16 @@ if __name__ == "__main__":
         for x in sstest[0]:
             total_train.append(x)
         
-        #kf = KFold(n_splits=10)
+        kf = KFold(n_splits=10)
         
         ## in this example, stratify according to the 0 class
-        kf = cross_validation.StratifiedKFold(total_test[:,0], n_folds=10)
+        #kf = cross_validation.StratifiedKFold(total_test[:,0], n_folds=10)
         current_fold = 0
         
         ## perform 10 repetitions
         for k in range(10):
             ## k - fold cross validation
-            for train_index, test_index in kf:
+            for train_index, test_index in kf.split(total_train):
                 current_fold +=1
                 print("Starting a new fold..")
                 x_train = [total_train[x] for x in train_index]

@@ -413,7 +413,7 @@ def hybrid_rnn_architecture(data, maxlen=500):
         d2_0 = Dense(64)(e2_x)
         activation_1 = ELU()(d2_0)
         drop_2 = Dropout(0.3)(activation_1)
-        d2_1 = Dense(32)(drop_2)
+        d2_1 = Dense(hidden_dims)(drop_2)
         pm = ELU()(d2_1)
         
         added = Add()([d1_1, pm])
