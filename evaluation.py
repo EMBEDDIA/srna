@@ -4,7 +4,6 @@ import numpy as np
 import itertools
 from misc import *
 import multiprocessing as mp
-from sklearn import cross_validation
 from sklearn.model_selection import KFold
 from keras.layers.advanced_activations import LeakyReLU,ELU
 from sklearn.preprocessing import OneHotEncoder
@@ -54,7 +53,7 @@ def read_json_file(path):
 def load_npz(fname,split_percentage=0.33):
 
     if "reuters" in fname:
-        (x_train, y_train), (x_test, y_test)  = load_data_reuters("datasets/reuters.npz")
+        (x_train, y_train), (x_test, y_test)  = load_data_reuters()
         word_index = read_json_file("datasets/reuters_word_index.json")
         
     elif "imdb" in fname:

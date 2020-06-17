@@ -10,7 +10,7 @@ from keras.preprocessing import sequence
 from keras.models import Sequential
 from keras.callbacks import *
 from keras.layers import Dense, Dropout, Activation, Input, Embedding,Bidirectional, Flatten
-from keras.layers import Conv1D, GlobalMaxPooling1D,Add,LSTM
+from keras.layers import Conv1D, GlobalAveragePooling1D,Concatenate,LSTM,TimeDistributed,MaxPooling1D,Reshape
 from keras.models import Model
 from keras.datasets import imdb
 from nltk.corpus import wordnet as wn
@@ -347,7 +347,8 @@ def simple_RNN_architecture(data,maxlen=500):
         ## a hybrid model with two inputs!
         input1 = Input(shape=(maxlen,))
         e1 = Embedding(max_features,embedding_dims)(input1)
-        c1 = LSTM(16)(e1)
+        d_zero = Dropout(0.1)(e1)
+        c1 = LSTM(16)(d_zero)
         d1 = Dropout(0.5)(c1)
         de1 = Dense(hidden_dims)(d1)
         d1_1 = Dropout(0.3)(de1)        
@@ -402,12 +403,13 @@ def hybrid_rnn_architecture(data, maxlen=500):
         ## a hybrid model with two inputs!
         input1 = Input(shape=(maxlen,))
         e1 = Embedding(max_features,embedding_dims)(input1)
-        d1 = Dropout(0.25)(e1)
-        c1 = LSTM(16)(e1)
-        de1 = Dense(hidden_dims)(c1)
+        d1 = Dropout(0.1)(e1)
+        c1 = LSTM(32,activation='relu', return_sequences = True)(d1)
+        distributed = TimeDistributed(Dense(1))(c1)
+        poolc1 = MaxPooling1D()(distributed)
+        de1 = Dense(hidden_dims)(poolc1)
         d1_1 = Dropout(0.25)(de1)
-        input2 = Input(shape=(semantic_shape,))
-        
+        input2 = Input(shape=(semantic_shape,))        
         e2_2 = Embedding(128, semantic_embedding_dims, input_length=semantic_shape)(input2)
         e2_x = Flatten()(e2_2)
         d2_0 = Dense(64)(e2_x)
@@ -415,8 +417,11 @@ def hybrid_rnn_architecture(data, maxlen=500):
         drop_2 = Dropout(0.3)(activation_1)
         d2_1 = Dense(hidden_dims)(drop_2)
         pm = ELU()(d2_1)
-        
-        added = Add()([d1_1, pm])
+        dim1 = d1_1.shape[1] * d1_1.shape[2]
+        dim2 = pm.shape[1]
+        l1 = Reshape([dim1])(d1_1)
+        l2 = Reshape([dim2])(pm)
+        added = Concatenate()([l1,l2])
         mix1 = Dense(100)(added)
         dp_1 = Dropout(0.3)(mix1)
         da_2 = ELU()(dp_1)

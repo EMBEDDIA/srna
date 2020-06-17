@@ -2,7 +2,7 @@ import numpy as np
 import json
 import warnings
 
-def load_data_reuters(path='reuters.npz', num_words=None, skip_top=0,
+def load_data_reuters(path='datasets/reuters.npz', num_words=None, skip_top=0,
               maxlen=None, test_split=0.2, seed=113,
               start_char=1, oov_char=2, index_from=3, **kwargs):
 
@@ -14,7 +14,7 @@ def load_data_reuters(path='reuters.npz', num_words=None, skip_top=0,
     if kwargs:
         raise TypeError('Unrecognized keyword arguments: ' + str(kwargs))
 
-    with np.load(path) as f:
+    with np.load(path, allow_pickle = True) as f:
         xs, labels = f['x'], f['y']
 
     rng = np.random.RandomState(seed)
@@ -81,7 +81,7 @@ def load_data_imdb(path='imdb.npz', num_words=None, skip_top=0,
         raise TypeError('Unrecognized keyword arguments: ' + str(kwargs))
 
 
-    with np.load(path) as f:
+    with np.load(path, allow_pickle = True) as f:
         x_train, labels_train = f['x_train'], f['y_train']
         x_test, labels_test = f['x_test'], f['y_test']
 
