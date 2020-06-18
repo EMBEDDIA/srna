@@ -407,7 +407,7 @@ def hybrid_rnn_architecture(data, maxlen=500):
         c1 = LSTM(32,activation='relu', return_sequences = True)(d1)
         distributed = TimeDistributed(Dense(1))(c1)
         poolc1 = MaxPooling1D()(distributed)
-        de1 = Dense(hidden_dims)(poolc1)
+        de1 = Dense(hidden_dims,activation = "elu")(poolc1)
         d1_1 = Dropout(0.25)(de1)
         input2 = Input(shape=(semantic_shape,))        
         e2_2 = Embedding(128, semantic_embedding_dims, input_length=semantic_shape)(input2)
